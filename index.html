@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title></title>
+  <style type="text/css">
+
+    body { font-family: Calibri, sans-serif; }
+    #container { text-align: center }
+    table { border-collapse: collapse; font-size: 2em; margin: 0 auto; }
+    colgroup, tbody { border: solid medium; }
+    td { border: solid thin; height: 1.4em; width: 1.4em; text-align: center; padding: 0; }
+    button { margin-top: 15px; font-size: 1.5em; }
+    
+    padd{padding-bottom: 100px;}
+  </style>
+</head>
+<body>
+  
+    
+  <div id="container">
+
+    <h1 class = "padd">Sudoku Solver</h1>
+
+    <table id="sudoku-board">
+      <colgroup><col><col><col>
+      <colgroup><col><col><col>
+      <colgroup><col><col><col>
+      <tbody>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>     
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+      <tbody>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>     
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+      <tbody>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>     
+       <tr> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td> <td contenteditable="true"></td>
+    </table>
+    <div>
+      <button id="solve-button">Solve!</button>
+    </div>
+    <div>
+      <button id="clear-button">Clear board</button>
+    </div>
+  </div>
+
+  <script>
+      document.getElementById("sudoku-board").addEventListener("keyup", function(event) {
+        if(event.target && event.target.nodeName == "TD") {
+          var validNum = /[1-9]/;
+          var tdEl = event.target;
+          if (tdEl.innerText.length > 0 && validNum.test(tdEl.innerText[0])) {
+            tdEl.innerText = tdEl.innerText[0];
+          } else {
+            tdEl.innerText = "";
+          }
+        }
+      });
+     
+      document.getElementById("clear-button").addEventListener("click", clearBoard);
+    
+      function clearBoard() {
+        var tds = document.getElementsByTagName("td");
+        for (var i = 0; i < tds.length; i++) {
+          tds[i].innerText = "";
+        }
+      }
+    
+    function isSafe(board, row, col, number) {
+        for (let i = 0; i < 9; i++) {
+          if (board[i][col] === String(number)) {
+            return false;
+          }
+          if (board[row][i] === String(number)) {
+            return false;
+          }
+        }
+      
+        const sr = Math.floor(row / 3) * 3;
+        const sc = Math.floor(col / 3) * 3;
+        for (let i = sr; i < sr + 3; i++) {
+          for (let j = sc; j < sc + 3; j++) {
+            if (board[i][j] === String(number)) {
+              return false;
+            }
+          }
+        }
+        return true;
+      }
+      
+      function helper(board, row, col) {
+        if (row === 9) {
+          return true;
+        }
+        let nrow = 0;
+        let ncol = 0;
+        if (col === 8) {
+          ncol = 0;
+          nrow = row + 1;
+        } else {
+          nrow = row;
+          ncol = col + 1;
+        }
+      
+        if (board[row][col] !== '.') {
+          if (helper(board, nrow, ncol)) {
+            return true;
+          }
+        } else {
+          for (let i = 1; i <= 9; i++) {
+            if (isSafe(board, row, col, i)) {
+              board[row][col] = String(i);
+              if (helper(board, nrow, ncol)) {
+                return true;
+              } else {
+                board[row][col] = '.';
+              }
+            }
+          }
+        }
+        return false;
+      }
+      
+      function solveSudoku(board) {
+        helper(board, 0, 0);
+      }
+      
+      document.addEventListener('DOMContentLoaded', function () {
+        const solveButton = document.getElementById('solve-button');
+        const clearButton = document.getElementById('clear-button');
+        const cells = Array.from(document.querySelectorAll('#sudoku-board td[contenteditable="true"]'));
+      
+        solveButton.addEventListener('click', function () {
+          const board = [];
+          for (let i = 0; i < 9; i++) {
+            const row = [];
+            for (let j = 0; j < 9; j++) {
+              row.push(cells[i * 9 + j].textContent || '.');
+            }
+            board.push(row);
+          }
+          solveSudoku(board);
+          for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
+              cells[i * 9 + j].textContent = board[i][j];
+            }
+          }
+        });
+      
+        clearButton.addEventListener('click', function () {
+          cells.forEach(function (cell) {
+            cell.textContent = '';
+          });
+        });
+      });
+
+  </script>
+</body>
